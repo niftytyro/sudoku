@@ -8,6 +8,11 @@ interface SudokuSubGridProps {
   subGrid: string;
 }
 
+interface SudokuGridCellProps {
+  value?: string;
+  selected: boolean;
+}
+
 const SudokuGrid: React.FC<SudokuGridProps> = ({ grid }) => {
   const subGrids = grid.match(/.{9}/g) ?? [];
 
@@ -22,18 +27,23 @@ const SudokuGrid: React.FC<SudokuGridProps> = ({ grid }) => {
 };
 
 const SudokuSubGrid: React.FC<SudokuSubGridProps> = ({ subGrid }) => {
-  console.log(subGrid);
-
   return (
     <div className="grid grid-rows-3 grid-cols-3 gap-px bg-darkGray">
       {Array.from({ length: 9 }).map((_, index) => (
-        <div
+        <SudokuGridCell
           key={index}
-          className="bg-white flex justify-center items-center font-bold text-5xl"
-        >
-          {subGrid[index] === "." ? "" : subGrid[index]}
-        </div>
+          value={subGrid[index] === "." ? "" : subGrid[index]}
+          selected={false}
+        />
       ))}
+    </div>
+  );
+};
+
+const SudokuGridCell: React.FC<SudokuGridCellProps> = ({ value, selected }) => {
+  return (
+    <div className="bg-white flex justify-center items-center font-bold text-5xl">
+      {value}
     </div>
   );
 };
