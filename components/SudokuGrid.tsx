@@ -135,8 +135,14 @@ const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
 }) => {
   return (
     <div
-      className={`bg-white flex justify-center items-center font-bold text-5xl ${
-        isSelected ? "bg-yellow" : isHighlighted ? "bg-gray" : ""
+      className={`flex justify-center items-center font-bold text-5xl ${
+        isSelected
+          ? "bg-yellow"
+          : isHighlighted
+          ? "bg-gray"
+          : isEditable
+          ? "bg-white"
+          : "bg-white"
       } ${isEditable ? "font-handwriting text-lightBlack" : ""}`}
     >
       {value}
