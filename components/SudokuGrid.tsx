@@ -1,5 +1,10 @@
 "use client";
 
+import {
+  calculateCellIndexInGrid,
+  calculateSubGrids,
+  validateSudokuGrid,
+} from "@/utils/grid";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 const GRID_COLUMNS = 9;
@@ -10,6 +15,7 @@ interface SudokuGridProps {
 }
 
 interface SudokuSubGridProps {
+  initialGrid: string;
   subGrid: string;
   index: number;
   selectedCell: { row: number; column: number };
@@ -17,37 +23,54 @@ interface SudokuSubGridProps {
 
 interface SudokuGridCellProps {
   value?: string;
-  selected: boolean;
-  highlighted: boolean;
+  isEditable: boolean;
+  isSelected: boolean;
+  isHighlighted: boolean;
 }
 
-const SudokuGrid: React.FC<SudokuGridProps> = ({ grid }) => {
+const SudokuGrid: React.FC<SudokuGridProps> = ({ grid: _grid }) => {
+  const [grid, setGrid] = useState(_grid);
   const [selectedCellRow, setSelectedCellRow] = useState(0);
   const [selectedCellColumn, setSelectedCellColumn] = useState(0);
   const subGrids = useMemo(() => grid.match(/.{9}/g) ?? [], [grid]);
+  const subGrids = useMemo(() => calculateSubGrids(grid), [grid]);
 
-  const onKeyDown = useCallback((e: KeyboardEvent) => {
-    switch (e.key) {
-      case "ArrowLeft":
-        e.preventDefault();
-        setSelectedCellColumn((col) => Math.max(0, col - 1));
-        break;
-      case "ArrowRight":
-        e.preventDefault();
-        setSelectedCellColumn((col) => Math.min(GRID_COLUMNS - 1, col + 1));
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        setSelectedCellRow((row) => Math.max(0, row - 1));
-        break;
-      case "ArrowDown":
-        e.preventDefault();
-        setSelectedCellRow((row) => Math.min(GRID_ROWS - 1, row + 1));
-        break;
-      default:
-        break;
-    }
+  const updateGrid = useCallback((index: number, newValue: string) => {
+    setGrid((grid) => {
+      const newGrid = grid.slice(0, index) + newValue + grid.slice(index + 1);
+      return newGrid;
+    });
   }, []);
+
+  const onKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      switch (e.key) {
+        case "ArrowLeft":
+          e.preventDefault();
+          setSelectedCellColumn((col) => Math.max(0, col - 1));
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          setSelectedCellColumn((col) => Math.min(GRID_COLUMNS - 1, col + 1));
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          setSelectedCellRow((row) => Math.max(0, row - 1));
+          break;
+        case "ArrowDown":
+          e.preventDefault();
+          setSelectedCellRow((row) => Math.min(GRID_ROWS - 1, row + 1));
+          break;
+        default:
+          const index = selectedCellRow * 9 + selectedCellColumn;
+          if (e.key.match(/^[1-9]$/g) && _grid[index] === ".") {
+            updateGrid(index, e.key);
+          }
+          break;
+      }
+    },
+    [_grid, selectedCellColumn, selectedCellRow, updateGrid]
+  );
 
   useEffect(() => {
     document.addEventListener("keydown", onKeyDown);
@@ -59,6 +82,7 @@ const SudokuGrid: React.FC<SudokuGridProps> = ({ grid }) => {
       {Array.from({ length: 9 }).map((_, index) => (
         // TODO what if subGrids is empty array or less than 9?
         <SudokuSubGrid
+          initialGrid={_grid}
           key={index}
           index={index}
           subGrid={subGrids[index]}
@@ -70,10 +94,13 @@ const SudokuGrid: React.FC<SudokuGridProps> = ({ grid }) => {
 };
 
 const SudokuSubGrid: React.FC<SudokuSubGridProps> = ({
+  initialGrid,
   subGrid,
   index: subGridIndex,
   selectedCell,
 }) => {
+  const initialSubGrid = calculateSubGrids(initialGrid)[subGridIndex];
+
   return (
     <div className="grid grid-rows-3 grid-cols-3 gap-px bg-darkGray">
       {Array.from({ length: 9 }).map((_, index) => {
@@ -87,10 +114,11 @@ const SudokuSubGrid: React.FC<SudokuSubGridProps> = ({
           <SudokuGridCell
             key={index}
             value={subGrid[index] === "." ? "" : subGrid[index]}
-            selected={
+            isEditable={initialSubGrid[index] === "."}
+            isSelected={
               column === selectedCell.column && row === selectedCell.row
             }
-            highlighted={
+            isHighlighted={
               // TODO refactor
               selectedCell.row === row ||
               selectedCell.column === column ||
@@ -105,31 +133,16 @@ const SudokuSubGrid: React.FC<SudokuSubGridProps> = ({
 };
 
 const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
-  value: _value,
-  selected,
-  highlighted,
+  value,
+  isEditable,
+  isSelected,
+  isHighlighted,
 }) => {
-  const [value, setValue] = useState(_value);
-
-  const onKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (selected && _value === "" && e.key.match(/[1-9]/g)) {
-        setValue(e.key);
-      }
-    },
-    [_value, selected]
-  );
-
-  useEffect(() => {
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [onKeyDown]);
-
   return (
     <div
       className={`bg-white flex justify-center items-center font-bold text-5xl ${
-        selected ? "bg-yellow" : highlighted ? "bg-gray" : ""
-      }`}
+        isSelected ? "bg-yellow" : isHighlighted ? "bg-gray" : ""
+      } ${isEditable ? "font-handwriting text-lightBlack" : ""}`}
     >
       {value}
     </div>

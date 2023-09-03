@@ -10,6 +10,7 @@ const config: Config = {
     colors: {
       white: "#FCFCFC",
       black: "#030303",
+      lightBlack: "#55535F", // lol
       yellow: "#FED766",
       lightYellow: "#FFF281",
       gray: "#EFF1F3",
