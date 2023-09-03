@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  calculateCellIndexInGrid,
-  calculateSubGrids,
-  validateSudokuGrid,
-} from "@/utils/grid";
+import { calculateSubGrids } from "@/utils/grid";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 const GRID_COLUMNS = 9;
@@ -32,7 +28,6 @@ const SudokuGrid: React.FC<SudokuGridProps> = ({ grid: _grid }) => {
   const [grid, setGrid] = useState(_grid);
   const [selectedCellRow, setSelectedCellRow] = useState(0);
   const [selectedCellColumn, setSelectedCellColumn] = useState(0);
-  const subGrids = useMemo(() => grid.match(/.{9}/g) ?? [], [grid]);
   const subGrids = useMemo(() => calculateSubGrids(grid), [grid]);
 
   const updateGrid = useCallback((index: number, newValue: string) => {
