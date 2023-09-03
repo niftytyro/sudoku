@@ -15,6 +15,7 @@ const config: Config = {
       lightYellow: "#FFF281",
       gray: "#EFF1F3",
       darkGray: "#A0A0A0",
+      red: "#FF0000",
     },
     fontFamily: {
       sans: ["var(--font-inter)"],

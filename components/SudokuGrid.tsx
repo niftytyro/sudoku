@@ -1,7 +1,13 @@
 "use client";
 
-import { calculateSubGrids } from "@/utils/grid";
+import {
+  calculateSubGrids,
+  extrapolateIndicesForSubGrid,
+  validateSudokuGrid,
+} from "@/utils/grid";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import Image from "next/image";
+import ErrorMark from "../images/error-mark.svg";
 
 const GRID_COLUMNS = 9;
 const GRID_ROWS = 9;
@@ -15,6 +21,7 @@ interface SudokuSubGridProps {
   subGrid: string;
   index: number;
   selectedCell: { row: number; column: number };
+  errorIndices: number[];
 }
 
 interface SudokuGridCellProps {
@@ -22,17 +29,22 @@ interface SudokuGridCellProps {
   isEditable: boolean;
   isSelected: boolean;
   isHighlighted: boolean;
+  isError: boolean;
 }
 
 const SudokuGrid: React.FC<SudokuGridProps> = ({ grid: _grid }) => {
   const [grid, setGrid] = useState(_grid);
   const [selectedCellRow, setSelectedCellRow] = useState(0);
   const [selectedCellColumn, setSelectedCellColumn] = useState(0);
+  const [errorIndices, setErrorIndices] = useState<number[]>([]);
   const subGrids = useMemo(() => calculateSubGrids(grid), [grid]);
 
   const updateGrid = useCallback((index: number, newValue: string) => {
     setGrid((grid) => {
       const newGrid = grid.slice(0, index) + newValue + grid.slice(index + 1);
+      setErrorIndices((errorIndices) =>
+        validateSudokuGrid(newGrid, errorIndices, index)
+      );
       return newGrid;
     });
   }, []);
@@ -82,6 +94,7 @@ const SudokuGrid: React.FC<SudokuGridProps> = ({ grid: _grid }) => {
           index={index}
           subGrid={subGrids[index]}
           selectedCell={{ column: selectedCellColumn, row: selectedCellRow }}
+          errorIndices={extrapolateIndicesForSubGrid(errorIndices, index)}
         />
       ))}
     </div>
@@ -93,6 +106,7 @@ const SudokuSubGrid: React.FC<SudokuSubGridProps> = ({
   subGrid,
   index: subGridIndex,
   selectedCell,
+  errorIndices,
 }) => {
   const initialSubGrid = calculateSubGrids(initialGrid)[subGridIndex];
 
@@ -109,6 +123,7 @@ const SudokuSubGrid: React.FC<SudokuSubGridProps> = ({
           <SudokuGridCell
             key={index}
             value={subGrid[index] === "." ? "" : subGrid[index]}
+            isError={errorIndices.includes(index)}
             isEditable={initialSubGrid[index] === "."}
             isSelected={
               column === selectedCell.column && row === selectedCell.row
@@ -132,6 +147,7 @@ const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
   isEditable,
   isSelected,
   isHighlighted,
+  isError,
 }) => {
   return (
     <div
@@ -145,6 +161,11 @@ const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
           : "bg-white"
       } ${isEditable ? "font-handwriting text-lightBlack" : ""}`}
     >
+      <Image
+        className={`absolute ${isError ? "" : "hidden"}`}
+        src={ErrorMark}
+        alt="error mark"
+      />
       {value}
     </div>
   );
