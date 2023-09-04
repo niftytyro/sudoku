@@ -10,7 +10,7 @@ interface RulesModalProps {
   onOpen: () => void;
   onClose: () => void;
 }
-interface GameFinishedModalProps {
+interface EndGameModalProps {
   time: string;
   isOpen: boolean;
   onOpen: () => void;
@@ -98,7 +98,7 @@ export const RulesModal: React.FC<RulesModalProps> = ({
   );
 };
 
-export const GameFinishedModal: React.FC<GameFinishedModalProps> = ({
+export const EndGameModal: React.FC<EndGameModalProps> = ({
   time,
   isOpen,
   onClose,

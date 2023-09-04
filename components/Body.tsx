@@ -1,6 +1,6 @@
 "use client";
 
-import { GameFinishedModal, RulesModal } from "@/components/Modal";
+import { EndGameModal, RulesModal } from "@/components/Modal";
 import SideBar from "@/components/SideBar";
 import SudokuContainer from "@/components/SudokuContainer";
 import useModal from "@/hooks/useModal";
@@ -20,15 +20,15 @@ const Body: React.FC<BodyProps> = ({ grid }) => {
     onOpen: openRulesModal,
   } = useModal();
   const {
-    isOpen: isGameFinishedModalOpen,
-    onClose: closeGameFinishedModal,
-    onOpen: openGameFinishedModal,
+    isOpen: isEndGameModalOpen,
+    onClose: closeEndGameModa,
+    onOpen: openEndGameModa,
   } = useModal();
 
-  const onGameFinish = useCallback(() => {
+  const onEndGame = useCallback(() => {
     stopTimer();
-    openGameFinishedModal();
-  }, [stopTimer, openGameFinishedModal]);
+    openEndGameModa();
+  }, [stopTimer, openEndGameModa]);
 
   return (
     <>
@@ -37,16 +37,16 @@ const Body: React.FC<BodyProps> = ({ grid }) => {
         onClose={closeRulesModal}
         onOpen={openRulesModal}
       />
-      <GameFinishedModal
-        isOpen={isGameFinishedModalOpen}
-        onClose={closeGameFinishedModal}
-        onOpen={openGameFinishedModal}
+      <EndGameModal
+        isOpen={isEndGameModalOpen}
+        onClose={closeEndGameModa}
+        onOpen={openEndGameModa}
         time={time}
       />
 
       <section className="flex justify-center h-full">
         <div className="flex-1" />
-        <SudokuContainer grid={grid} onGameFinish={onGameFinish} />
+        <SudokuContainer grid={grid} onEndGame={onEndGame} />
         <SideBar showRulesModal={openRulesModal} time={time} />
       </section>
     </>
