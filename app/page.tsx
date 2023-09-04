@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import Button from "@/components/Button";
 import SudokuContainer from "@/components/SudokuContainer";
+import Timer from "@/components/Timer";
 
 export default async function Home() {
   const supabase = createServerComponentClient({ cookies });
@@ -14,7 +15,7 @@ export default async function Home() {
         <div className="flex-1" />
         <SudokuContainer grid={puzzle} />
         <div className="flex-1 flex flex-col justify-center items-center pb-48">
-          <p className="text-3xl mb-5">00:27</p>
+          <Timer />
           <Button>
             <span className="text-2xl leading-none mr-2">+</span> New Game
           </Button>
