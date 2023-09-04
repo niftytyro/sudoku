@@ -1,3 +1,6 @@
+export const isValidSudokuInput = (input?: string) =>
+  input?.match(/^[1-9]$/g)?.length;
+
 export const calculateSubGrids = (grid: string) => {
   const subGrids = [];
   const rows = grid.match(/.{9}/g) ?? [];
@@ -29,24 +32,32 @@ export const calculateCellIndexInGrid = (
   return cellIndex;
 };
 
-export const checkLatestMove = (grid: string, latestMoveIndex: number) => {
+export const validateGridAtIndex = (grid: string, moveIndex: number) => {
   // Indices to check - row, column and the subgrid
   const errorIndices = new Set<number>();
 
   // Traversing the row
-  const row = Math.floor(latestMoveIndex / 9);
+  const row = Math.floor(moveIndex / 9);
   for (let i = 0; i < 9; i++) {
     const index = row * 9 + i;
-    if (grid[index] === grid[latestMoveIndex] && index !== latestMoveIndex) {
+    if (
+      grid[index] === grid[moveIndex] &&
+      isValidSudokuInput(grid[index]) &&
+      index !== moveIndex
+    ) {
       errorIndices.add(index);
     }
   }
 
   // Traversing the column
-  const column = latestMoveIndex % 9;
+  const column = moveIndex % 9;
   for (let i = 0; i < 9; i++) {
     const index = i * 9 + column;
-    if (grid[index] === grid[latestMoveIndex] && index !== latestMoveIndex) {
+    if (
+      grid[index] === grid[moveIndex] &&
+      isValidSudokuInput(grid[index]) &&
+      index !== moveIndex
+    ) {
       errorIndices.add(index);
     }
   }
@@ -59,14 +70,18 @@ export const checkLatestMove = (grid: string, latestMoveIndex: number) => {
     for (let j = 0; j < 3; j++) {
       const column = subGridColumn * 3 + j;
       const index = row * 9 + column;
-      if (grid[index] === grid[latestMoveIndex] && index !== latestMoveIndex) {
+      if (
+        grid[index] === grid[moveIndex] &&
+        isValidSudokuInput(grid[index]) &&
+        index !== moveIndex
+      ) {
         errorIndices.add(index);
       }
     }
   }
 
   if (errorIndices.size) {
-    errorIndices.add(latestMoveIndex);
+    errorIndices.add(moveIndex);
   }
 
   return errorIndices;
@@ -82,7 +97,9 @@ export const validateSudokuGrid = (
 
   // TODO Optimize
   prevIndices.add(latestMoveIndex).forEach((index) => {
-    const indices = checkLatestMove(grid, index);
+    const indices = validateGridAtIndex(grid, index);
+
+    console.log(index, grid[index], indices);
     indices.forEach((idx) => errorIndices.add(idx));
   });
 
