@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  InputMode,
   calculateCellIndexInGrid,
   calculateSubGrids,
   extrapolateIndicesForSubGrid,
@@ -9,14 +10,29 @@ import {
 } from "@/utils/grid";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import ErrorMark from "../images/error-mark.svg";
+import ErrorMark from "../icons/error-mark.svg";
 import { range } from "@/utils/utils";
+import SudokuInput from "./SudokuInput";
 
 const GRID_COLUMNS = 9;
 const GRID_ROWS = 9;
 
+interface SudokuContainerProps {
+  grid: string;
+}
+
 interface SudokuGridProps {
   grid: string;
+  initialGrid: string;
+  errorIndices: number[];
+  selectedCellRow: number;
+  selectedCellColumn: number;
+  inputMode: InputMode;
+  setErrorIndices: React.Dispatch<React.SetStateAction<number[]>>;
+  setInputMode: React.Dispatch<React.SetStateAction<InputMode>>;
+  setSelectedCellRow: React.Dispatch<React.SetStateAction<number>>;
+  setSelectedCellColumn: React.Dispatch<React.SetStateAction<number>>;
+  updateGrid: (index: number, value: string | null) => void;
 }
 
 interface SudokuSubGridProps {
@@ -25,7 +41,7 @@ interface SudokuSubGridProps {
   index: number;
   selectedCell: { row: number; column: number };
   errorIndices: number[];
-  inputMode: "input" | "notes";
+  inputMode: InputMode;
   setValue: (index: number, v: string | null) => void;
 }
 
@@ -36,25 +52,76 @@ interface SudokuGridCellProps {
   isSelected: boolean;
   isHighlighted: boolean;
   isError: boolean;
-  inputMode: "input" | "notes";
+  inputMode: InputMode;
 }
 
-const SudokuGrid: React.FC<SudokuGridProps> = ({ grid: _grid }) => {
-  const [grid, setGrid] = useState(_grid);
+const SudokuContainer: React.FC<SudokuContainerProps> = ({
+  grid: initialGrid,
+}) => {
+  const [grid, setGrid] = useState(initialGrid);
   const [selectedCellRow, setSelectedCellRow] = useState(0);
   const [selectedCellColumn, setSelectedCellColumn] = useState(0);
   const [errorIndices, setErrorIndices] = useState<number[]>([]);
-  const subGrids = useMemo(() => calculateSubGrids(grid), [grid]);
+  const [inputMode, setInputMode] = useState<"notes" | "input">("input");
 
-  const updateGrid = useCallback((index: number, newValue: string) => {
+  const updateGrid = useCallback((index: number, newValue: string | null) => {
     setGrid((grid) => {
-      const newGrid = grid.slice(0, index) + newValue + grid.slice(index + 1);
+      const newGrid =
+        grid.slice(0, index) + (newValue ?? ".") + grid.slice(index + 1);
       setErrorIndices((errorIndices) =>
         validateSudokuGrid(newGrid, errorIndices, index)
       );
       return newGrid;
     });
   }, []);
+
+  return (
+    <div className="shrink-0 grow flex flex-col items-center">
+      <SudokuGrid
+        grid={grid}
+        initialGrid={initialGrid}
+        errorIndices={errorIndices}
+        inputMode={inputMode}
+        selectedCellColumn={selectedCellColumn}
+        selectedCellRow={selectedCellRow}
+        setErrorIndices={setErrorIndices}
+        setInputMode={setInputMode}
+        setSelectedCellColumn={setSelectedCellColumn}
+        setSelectedCellRow={setSelectedCellRow}
+        updateGrid={updateGrid}
+      />
+      <SudokuInput
+        inputMode={inputMode}
+        toggleNotes={() =>
+          setInputMode(inputMode === "input" ? "notes" : "input")
+        }
+        onInput={(i) => {
+          if (inputMode === "input") {
+            updateGrid(selectedCellRow * 9 + selectedCellColumn, i.toString());
+          } else {
+            document.dispatchEvent(
+              new KeyboardEvent("keydown", { key: i.toString() })
+            );
+          }
+        }}
+      />
+    </div>
+  );
+};
+
+const SudokuGrid: React.FC<SudokuGridProps> = ({
+  grid,
+  initialGrid,
+  errorIndices,
+  inputMode,
+  selectedCellColumn,
+  selectedCellRow,
+  setInputMode,
+  setSelectedCellColumn,
+  setSelectedCellRow,
+  updateGrid,
+}) => {
+  const subGrids = useMemo(() => calculateSubGrids(grid), [grid]);
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -81,14 +148,23 @@ const SudokuGrid: React.FC<SudokuGridProps> = ({ grid: _grid }) => {
         default:
           if (inputMode === "input") {
             const index = selectedCellRow * 9 + selectedCellColumn;
-            if (isValidSudokuInput(e.key) && _grid[index] === ".") {
+            if (isValidSudokuInput(e.key) && initialGrid[index] === ".") {
               updateGrid(index, e.key);
             }
           }
           break;
       }
     },
-    [_grid, inputMode, selectedCellColumn, selectedCellRow, updateGrid]
+    [
+      initialGrid,
+      inputMode,
+      selectedCellColumn,
+      selectedCellRow,
+      setInputMode,
+      setSelectedCellColumn,
+      setSelectedCellRow,
+      updateGrid,
+    ]
   );
 
   useEffect(() => {
@@ -101,7 +177,7 @@ const SudokuGrid: React.FC<SudokuGridProps> = ({ grid: _grid }) => {
       {Array.from({ length: 9 }).map((_, subGridIndex) => (
         // TODO what if subGrids is empty array or less than 9?
         <SudokuSubGrid
-          initialGrid={_grid}
+          initialGrid={initialGrid}
           key={subGridIndex}
           index={subGridIndex}
           inputMode={inputMode}
@@ -242,4 +318,4 @@ const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
   );
 };
 
-export default SudokuGrid;
+export default SudokuContainer;

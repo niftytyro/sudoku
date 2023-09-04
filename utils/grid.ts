@@ -1,3 +1,5 @@
+export type InputMode = "input" | "notes";
+
 export const isValidSudokuInput = (input?: string) =>
   input?.match(/^[1-9]$/g)?.length;
 

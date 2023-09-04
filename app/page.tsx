@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import Button from "@/components/Button";
-import SudokuGrid from "@/components/SudokuGrid";
+import SudokuContainer from "@/components/SudokuContainer";
 
 export default async function Home() {
   const supabase = createServerComponentClient({ cookies });
@@ -11,9 +11,8 @@ export default async function Home() {
     <main className="h-full py-4">
       <h1 className="text-center font-semibold text-4xl mb-8">Sudoku</h1>
       <section className="flex justify-center h-full">
-        <div className="flex-[2] flex justify-end">
-          <SudokuGrid grid={puzzle} />
-        </div>
+        <div className="flex-1" />
+        <SudokuContainer grid={puzzle} />
         <div className="flex-1 flex flex-col justify-center items-center pb-48">
           <p className="text-3xl mb-5">00:27</p>
           <Button>
