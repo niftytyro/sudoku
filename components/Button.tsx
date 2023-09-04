@@ -1,15 +1,22 @@
 import React from "react";
 
 interface ButtonProps {
-  children: React.ReactNode;
+  type?: "primary" | "secondary";
+  children?: React.ReactNode;
   onClick: () => void;
 }
 
-const Button: React.FC<ButtonProps> = ({ children, onClick }) => {
+const Button: React.FC<ButtonProps> = ({
+  children,
+  type = "primary",
+  onClick,
+}) => {
   return (
     <button
       onClick={onClick}
-      className="bg-lightYellow py-3 px-5 border rounded-md flex items-center justify-center"
+      className={`${
+        type === "primary" ? "bg-lightYellow" : "bg-gray"
+      } py-3 px-5 border rounded-md flex items-center justify-center`}
     >
       {children}
     </button>

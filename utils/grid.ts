@@ -100,8 +100,6 @@ export const validateSudokuGrid = (
   // TODO Optimize
   prevIndices.add(latestMoveIndex).forEach((index) => {
     const indices = validateGridAtIndex(grid, index);
-
-    console.log(index, grid[index], indices);
     indices.forEach((idx) => errorIndices.add(idx));
   });
 

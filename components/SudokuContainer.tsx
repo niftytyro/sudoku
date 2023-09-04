@@ -19,6 +19,7 @@ const GRID_ROWS = 9;
 
 interface SudokuContainerProps {
   grid: string;
+  onGameFinish: () => void;
 }
 
 interface SudokuGridProps {
@@ -57,6 +58,7 @@ interface SudokuGridCellProps {
 
 const SudokuContainer: React.FC<SudokuContainerProps> = ({
   grid: initialGrid,
+  onGameFinish,
 }) => {
   const [grid, setGrid] = useState(initialGrid);
   const [selectedCellRow, setSelectedCellRow] = useState(0);
@@ -71,9 +73,16 @@ const SudokuContainer: React.FC<SudokuContainerProps> = ({
       setErrorIndices((errorIndices) =>
         validateSudokuGrid(newGrid, errorIndices, index)
       );
+
       return newGrid;
     });
   }, []);
+
+  useEffect(() => {
+    if (grid.indexOf(".") < 0) {
+      onGameFinish();
+    }
+  }, [grid, onGameFinish]);
 
   return (
     <div className="shrink-0 grow flex flex-col items-center">
