@@ -48,7 +48,7 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className={`absolute top-0 left-0 right-0 bottom-0 ${
+      className={`fixed z-10 top-0 left-0 right-0 bottom-0 ${
         isOpen ? "" : "hidden"
       }`}
     >
@@ -56,15 +56,17 @@ const Modal: React.FC<ModalProps> = ({
         onClick={() => onClose()}
         className="w-full h-full bg-lightBlack opacity-50"
       />
-      <div className="z-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-black bg-white pt-6 pb-12 px-8">
+      <div className="z-10 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-black bg-white p-6 md:pt-6 md:pb-12 md:px-8 w-4/5 md:w-3/5 max-w-full max-h-[80%] overflow-y-scroll">
         <div className="flex justify-between items-center mb-6">
-          <div />
-          <h1 className="text-center text-2xl font-semibold">{title}</h1>
+          <div className="w-8 md:w-12" />
+          <h1 className="text-center text-lg md:text-2xl font-semibold">
+            {title}
+          </h1>
           {showCloseButton ? (
             <Image
               src={CrossIcon}
               alt="exit"
-              className="cursor-pointer"
+              className="cursor-pointer w-8 md:w-12"
               onClick={() => onClose()}
             />
           ) : null}
@@ -82,7 +84,7 @@ export const RulesModal: React.FC<RulesModalProps> = ({
 }) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} onOpen={onOpen} title="Rules">
-      <p>
+      <p className="text-xs md:text-base">
         {`Playing Sudoku is a brain-teasing puzzle game that's both fun and
         challenging. To get started, you'll need a 9x9 grid divided into nine
         3x3 regions. Your goal is to fill in the entire grid with numbers from 1
@@ -111,7 +113,9 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
       onOpen={onOpen}
       title="Congratulations"
     >
-      <p>You finished the game in {time}. Wanna play another game?</p>
+      <p className="text-xs md:text-base">
+        You finished the game in {time}. Wanna play another game?
+      </p>
       <div className="flex justify-center items-center space-x-8 mt-8">
         <Button onClick={() => location.reload()}>Yes, please</Button>
         <Button onClick={() => onClose()} type="secondary">

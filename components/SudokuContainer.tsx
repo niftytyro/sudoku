@@ -182,7 +182,7 @@ const SudokuGrid: React.FC<SudokuGridProps> = ({
   }, [onKeyDown]);
 
   return (
-    <div className="grid grid-rows-3 grid-cols-3 h-5/6 aspect-square gap-0.5 bg-black border-[5px] border-black">
+    <div className="grid grid-rows-3 grid-cols-3 w-full xl:h-4/5 aspect-square gap-0.5 bg-black border-[5px] border-black">
       {Array.from({ length: 9 }).map((_, subGridIndex) => (
         // TODO what if subGrids is empty array or less than 9?
         <SudokuSubGrid
@@ -304,11 +304,11 @@ const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
           ? "bg-white"
           : "bg-white"
       } ${isEditable ? "font-handwriting text-lightBlack" : ""} ${
-        showNotes ? "text-base" : "text-5xl"
+        showNotes ? "text-base" : "text-3xl sm:text-5xl"
       }`}
     >
       <Image
-        className={`absolute ${isError ? "" : "hidden"}`}
+        className={`absolute ${isError ? "" : "hidden"} w-6 md:w-16`}
         src={ErrorMark}
         alt="error mark"
       />

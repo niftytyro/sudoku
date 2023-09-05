@@ -16,23 +16,23 @@ const SudokuInput: React.FC<SudokuInputProps> = ({
   toggleNotes,
 }) => {
   return (
-    <div className="w-full flex justify-center space-x-4 items-stretch mt-7 text-4xl text-lightBlack font-handwriting font-medium">
+    <div className="w-full grid grid-cols-5 md:grid-cols-10 justify-items-center mt-7 mb-12 text-3xl md:text-4xl text-lightBlack font-handwriting font-medium">
       {range(1, 10).map((i) => (
         <button
           key={i}
           onClick={() => onInput(i)}
-          className="border-[0.5px] border-darkGray aspect-square flex justify-center items-center rounded-lg pr-1 pb-1"
+          className="border-[0.5px] border-darkGray w-10 md:w-16 h-10 md:h-16 flex justify-center items-center rounded-lg pr-1 pb-1 mt-2"
         >
           {i}
         </button>
       ))}
       <button
         onClick={toggleNotes}
-        className={`border-[0.5px] border-darkGray w-16 h-16 flex justify-center items-center rounded-lg ${
+        className={`border-[0.5px] border-darkGray w-10 md:w-16 h-10 md:h-16 flex justify-center items-center rounded-lg mt-2 ${
           inputMode === "notes" ? "bg-yellow" : ""
         }`}
       >
-        <Image src={EditIcon} alt="edit" className="" />
+        <Image src={EditIcon} alt="edit" className="w-6 md:w-9 h-6 md:h-9" />
       </button>
     </div>
   );

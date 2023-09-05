@@ -5,7 +5,7 @@ interface TimerProps {
 }
 
 const Timer: React.FC<TimerProps> = ({ time }) => {
-  return <p className="text-3xl mb-5">{time}</p>;
+  return <p className="text-3xl xl:mb-5">{time}</p>;
 };
 
 export default Timer;

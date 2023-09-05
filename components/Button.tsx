@@ -16,7 +16,7 @@ const Button: React.FC<ButtonProps> = ({
       onClick={onClick}
       className={`${
         type === "primary" ? "bg-lightYellow" : "bg-gray"
-      } py-3 px-5 border rounded-md flex items-center justify-center`}
+      } py-2 md:py-3 px-3 md:px-5 text-xs md:text-base border rounded-md flex items-center justify-center`}
     >
       {children}
     </button>
