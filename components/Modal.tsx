@@ -113,7 +113,7 @@ export const EndGameModal: React.FC<EndGameModalProps> = ({
       onOpen={onOpen}
       title="Congratulations"
     >
-      <p className="text-xs md:text-base">
+      <p className="text-xs md:text-lg text-center">
         You finished the game in {time}. Wanna play another game?
       </p>
       <div className="flex justify-center items-center space-x-8 mt-8">
