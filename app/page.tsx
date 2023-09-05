@@ -8,7 +8,7 @@ export default async function Home() {
 
   return (
     <>
-      <main className="py-8 px-8">
+      <main className="py-8 px-2 md:px-8">
         <h1 className="text-center font-semibold text-4xl mb-8">Sudoku</h1>
         <Body grid={puzzle} />
       </main>

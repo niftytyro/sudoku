@@ -19,7 +19,7 @@ export const calculateSubGrids = (grid: string) => {
   return subGrids;
 };
 
-export const calculateCellIndexInGrid = (
+export const calculateCellCoordinatesInGrid = (
   subGridIndex: number,
   cellIndexInSubGrid: number
 ) => {
@@ -28,6 +28,18 @@ export const calculateCellIndexInGrid = (
 
   column += (subGridIndex % 3) * 3;
   row += Math.floor(subGridIndex / 3) * 3;
+
+  return { column, row };
+};
+
+export const calculateCellIndexInGrid = (
+  subGridIndex: number,
+  cellIndexInSubGrid: number
+) => {
+  const { column, row } = calculateCellCoordinatesInGrid(
+    subGridIndex,
+    cellIndexInSubGrid
+  );
 
   const cellIndex = row * 9 + column;
 

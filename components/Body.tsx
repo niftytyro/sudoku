@@ -44,7 +44,7 @@ const Body: React.FC<BodyProps> = ({ grid }) => {
         time={time}
       />
 
-      <section className="flex flex-col-reverse xl:flex-row justify-center max-w-2xl mx-auto xl:max-w-none h-full">
+      <section className="flex flex-col-reverse xl:flex-row justify-center mx-auto h-full">
         <div className="flex-1 hidden xl:block" />
         <SudokuContainer grid={grid} onEndGame={onEndGame} />
         <Options time={time} />

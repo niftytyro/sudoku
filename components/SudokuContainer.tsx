@@ -2,6 +2,7 @@
 
 import {
   InputMode,
+  calculateCellCoordinatesInGrid,
   calculateCellIndexInGrid,
   calculateSubGrids,
   extrapolateIndicesForSubGrid,
@@ -13,6 +14,27 @@ import Image from "next/image";
 import ErrorMark from "../icons/error-mark.svg";
 import { range } from "@/utils/utils";
 import SudokuInput from "./SudokuInput";
+import Notes1 from "../icons/1.svg";
+import Notes2 from "../icons/2.svg";
+import Notes3 from "../icons/3.svg";
+import Notes4 from "../icons/4.svg";
+import Notes5 from "../icons/5.svg";
+import Notes6 from "../icons/6.svg";
+import Notes7 from "../icons/7.svg";
+import Notes8 from "../icons/8.svg";
+import Notes9 from "../icons/9.svg";
+
+const NotesIcons = [
+  Notes1,
+  Notes2,
+  Notes3,
+  Notes4,
+  Notes5,
+  Notes6,
+  Notes7,
+  Notes8,
+  Notes9,
+];
 
 const GRID_COLUMNS = 9;
 const GRID_ROWS = 9;
@@ -43,6 +65,7 @@ interface SudokuSubGridProps {
   selectedCell: { row: number; column: number };
   errorIndices: number[];
   inputMode: InputMode;
+  selectCell: (index: number) => void;
   setValue: (index: number, v: string | null) => void;
 }
 
@@ -54,6 +77,7 @@ interface SudokuGridCellProps {
   isHighlighted: boolean;
   isError: boolean;
   inputMode: InputMode;
+  selectCell: () => void;
 }
 
 const SudokuContainer: React.FC<SudokuContainerProps> = ({
@@ -85,7 +109,7 @@ const SudokuContainer: React.FC<SudokuContainerProps> = ({
   }, [errorIndices.length, grid, onEndGame]);
 
   return (
-    <div className="shrink-0 grow flex flex-col items-center">
+    <div className="shrink-0 grow flex flex-col items-center max-w-3xl">
       <SudokuGrid
         grid={grid}
         initialGrid={initialGrid}
@@ -199,6 +223,14 @@ const SudokuGrid: React.FC<SudokuGridProps> = ({
           setValue={(cellIndex, value) =>
             updateGrid(calculateCellIndexInGrid(subGridIndex, cellIndex), value)
           }
+          selectCell={(cellIndex) => {
+            const { row, column } = calculateCellCoordinatesInGrid(
+              subGridIndex,
+              cellIndex
+            );
+            setSelectedCellColumn(column);
+            setSelectedCellRow(row);
+          }}
         />
       ))}
     </div>
@@ -213,6 +245,7 @@ const SudokuSubGrid: React.FC<SudokuSubGridProps> = ({
   errorIndices,
   inputMode,
   setValue,
+  selectCell,
 }) => {
   const initialSubGrid = calculateSubGrids(initialGrid)[subGridIndex];
 
@@ -230,6 +263,7 @@ const SudokuSubGrid: React.FC<SudokuSubGridProps> = ({
             key={index}
             value={subGrid[index] === "." ? "" : subGrid[index]}
             setValue={(value) => setValue(index, value)}
+            selectCell={() => selectCell(index)}
             inputMode={inputMode}
             isError={errorIndices.includes(index)}
             isEditable={initialSubGrid[index] === "."}
@@ -258,9 +292,10 @@ const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
   isHighlighted,
   isError,
   inputMode,
+  selectCell,
 }) => {
   const [notes, setNotes] = useState<number[]>([]);
-  let [showNotes, setShowNotes] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
 
   useEffect(() => {
     setShowNotes(!isValidSudokuInput(value));
@@ -295,7 +330,10 @@ const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
 
   return (
     <div
-      className={`flex justify-center items-center font-bold ${
+      onClick={selectCell}
+      className={`${
+        showNotes ? "" : "flex justify-center items-center"
+      } font-bold overflow-hidden ${
         isSelected
           ? "bg-yellow"
           : isHighlighted
@@ -313,11 +351,14 @@ const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
         alt="error mark"
       />
       {showNotes ? (
-        <div className="grid grid-rows-3 grid-cols-3 text-lightBlack text-center w-full p-2">
+        <div className="w-full h-full grid grid-rows-3 grid-cols-3 justify-items-center items-center text-lightBlack text-center md:p-2">
           {range(1, 10).map((i) => (
-            <p key={i} className={`${notes.includes(i) ? "" : "invisible"}`}>
-              {i}
-            </p>
+            <Image
+              key={i}
+              src={NotesIcons[i - 1]}
+              alt={`${i}`}
+              className={`${notes.includes(i) ? "" : "invisible"} h-2/3`}
+            />
           ))}
         </div>
       ) : (

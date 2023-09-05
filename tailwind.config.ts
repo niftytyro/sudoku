@@ -7,6 +7,11 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    extend: {
+      fontSize: {
+        xxs: "1px",
+      },
+    },
     colors: {
       white: "#FCFCFC",
       black: "#030303",
