@@ -303,7 +303,12 @@ const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (inputMode === "notes" && isValidSudokuInput(e.key) && isSelected) {
+      if (
+        inputMode === "notes" &&
+        isValidSudokuInput(e.key) &&
+        isSelected &&
+        isEditable
+      ) {
         const number = parseInt(e.key);
         setNotes((notes) => {
           const index = notes.indexOf(number);
@@ -320,7 +325,7 @@ const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
         setValue(null);
       }
     },
-    [inputMode, isSelected, setValue]
+    [inputMode, isEditable, isSelected, setValue]
   );
 
   useEffect(() => {
