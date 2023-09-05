@@ -79,10 +79,10 @@ const SudokuContainer: React.FC<SudokuContainerProps> = ({
   }, []);
 
   useEffect(() => {
-    if (grid.indexOf(".") < 0) {
+    if (grid.indexOf(".") < 0 && errorIndices.length === 0) {
       onEndGame();
     }
-  }, [grid, onEndGame]);
+  }, [errorIndices.length, grid, onEndGame]);
 
   return (
     <div className="shrink-0 grow flex flex-col items-center">
