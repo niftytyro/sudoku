@@ -20,6 +20,7 @@ const SudokuInput: React.FC<SudokuInputProps> = ({
       {range(1, 10).map((i) => (
         <button
           key={i}
+          data-testid={`btn-input-${i}`}
           onClick={() => onInput(i)}
           className="border-[0.5px] border-darkGray w-10 md:w-16 h-10 md:h-16 flex justify-center items-center rounded-lg pr-1 pb-1 mt-2"
         >
@@ -27,6 +28,7 @@ const SudokuInput: React.FC<SudokuInputProps> = ({
         </button>
       ))}
       <button
+        data-testid={`btn-toggle-notes`}
         onClick={toggleNotes}
         className={`border-[0.5px] border-darkGray w-10 md:w-16 h-10 md:h-16 flex justify-center items-center rounded-lg mt-2 ${
           inputMode === "notes" ? "bg-yellow" : ""

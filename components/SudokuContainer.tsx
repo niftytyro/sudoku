@@ -64,18 +64,20 @@ interface SudokuSubGridProps {
   selectedCell: { row: number; column: number };
   errorIndices: number[];
   inputMode: InputMode;
+  index: number;
   selectCell: (index: number) => void;
   setValue: (index: number, v: string | null) => void;
 }
 
 export interface SudokuGridCellProps {
   value?: string;
-  onUpdateNotes: () => void;
   isEditable: boolean;
   isSelected: boolean;
   isHighlighted: boolean;
   isError: boolean;
   inputMode: InputMode;
+  testId: string;
+  onUpdateNotes: () => void;
   selectCell: () => void;
 }
 
@@ -227,6 +229,7 @@ const SudokuGrid: React.FC<SudokuGridProps> = ({
           // TODO what if subGrids is empty array or less than 9?
           <SudokuSubGrid
             key={subGridIndex}
+            index={subGridIndex}
             inputMode={inputMode}
             subGrid={subGrids[subGridIndex]}
             initialSubGrid={initialSubGrids[subGridIndex]}
@@ -265,6 +268,7 @@ const SudokuSubGrid: React.FC<SudokuSubGridProps> = ({
   selectedCell,
   errorIndices,
   inputMode,
+  index: subGridIndex,
   setValue,
   selectCell,
 }) => {
@@ -274,9 +278,15 @@ const SudokuSubGrid: React.FC<SudokuSubGridProps> = ({
         const column = index % 3;
         const row = Math.floor(index / 3);
 
+        const { column: columnInGrid, row: rowInGrid } =
+          calculateCellCoordinatesInGrid(subGridIndex, index);
+
+        const testId = `${columnInGrid}-${rowInGrid}`;
+
         return (
           <SudokuGridCell
             key={index}
+            testId={testId}
             value={subGrid[index]}
             onUpdateNotes={() => setValue(index, null)}
             selectCell={() => selectCell(index)}
@@ -302,6 +312,7 @@ const SudokuSubGrid: React.FC<SudokuSubGridProps> = ({
 };
 
 export const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
+  testId,
   value,
   isEditable,
   isSelected,
@@ -313,10 +324,6 @@ export const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
 }) => {
   const [notes, setNotes] = useState<number[]>([]);
   const [showNotes, setShowNotes] = useState(false);
-
-  if (isHighlighted) {
-    // console.log("val", value);
-  }
 
   useEffect(() => {
     // If there is a new input, hide the notes
@@ -357,6 +364,7 @@ export const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
 
   return (
     <div
+      data-testid={`sudoku-cell-${testId}`}
       onClick={selectCell}
       className={`${
         showNotes ? "" : "flex justify-center items-center"
@@ -382,6 +390,7 @@ export const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
           {range(1, 10).map((i) => (
             <Image
               key={i}
+              data-testid={`sudoku-cell-${testId}-notes-${i}`}
               src={NotesIcons[i - 1]}
               alt={`${i}`}
               className={`${notes.includes(i) ? "" : "invisible"} h-2/3`}
@@ -391,7 +400,7 @@ export const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
       ) : value === "." ? (
         ""
       ) : (
-        value
+        <p>{value}</p>
       )}
     </div>
   );

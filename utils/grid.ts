@@ -135,3 +135,10 @@ export const extrapolateIndicesForSubGrid = (
       return row * 3 + column;
     });
 };
+
+export const calculateCellCoordinatesFromIndex = (index: number) => {
+  const column = index % 9;
+  const row = Math.floor(index / 9);
+
+  return { column, row };
+};
