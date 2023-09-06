@@ -103,6 +103,24 @@ const SudokuContainer: React.FC<SudokuContainerProps> = ({
     });
   }, []);
 
+  const onInput = useCallback(
+    (i: number) => {
+      const index = selectedCellRow * 9 + selectedCellColumn;
+      if (
+        isValidSudokuInput(i.toString()) &&
+        initialGrid[index] === "." &&
+        inputMode === "input"
+      ) {
+        updateGrid(index, i.toString());
+      } else {
+        document.dispatchEvent(
+          new KeyboardEvent("keydown", { key: i.toString() })
+        );
+      }
+    },
+    [initialGrid, inputMode, selectedCellColumn, selectedCellRow, updateGrid]
+  );
+
   useEffect(() => {
     if (grid.indexOf(".") < 0 && errorIndices.length === 0) {
       onEndGame();
@@ -129,15 +147,7 @@ const SudokuContainer: React.FC<SudokuContainerProps> = ({
         toggleNotes={() =>
           setInputMode(inputMode === "input" ? "notes" : "input")
         }
-        onInput={(i) => {
-          if (inputMode === "input") {
-            updateGrid(selectedCellRow * 9 + selectedCellColumn, i.toString());
-          } else {
-            document.dispatchEvent(
-              new KeyboardEvent("keydown", { key: i.toString() })
-            );
-          }
-        }}
+        onInput={onInput}
       />
     </div>
   );
