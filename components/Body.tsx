@@ -55,6 +55,7 @@ const Body: React.FC<BodyProps> = ({ grid }) => {
         <p className="text-xs md:text-sm">Made with ❤️ for Mobbin</p>
         <span className="text-xs md:text-sm">•</span>
         <div
+          data-testid="rules-link"
           className="cursor-pointer underline text-xs md:text-sm"
           onClick={openRulesModal}
         >

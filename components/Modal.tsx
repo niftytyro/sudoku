@@ -48,7 +48,8 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className={`fixed z-10 top-0 left-0 right-0 bottom-0 ${
+      data-testid={`modal-${title?.toLowerCase()}`}
+      className={`modal-container fixed z-10 top-0 left-0 right-0 bottom-0 ${
         isOpen ? "" : "hidden"
       }`}
     >
