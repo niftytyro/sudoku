@@ -21,14 +21,14 @@ const Body: React.FC<BodyProps> = ({ grid }) => {
   } = useModal();
   const {
     isOpen: isEndGameModalOpen,
-    onClose: closeEndGameModa,
-    onOpen: openEndGameModa,
+    onClose: closeEndGameModal,
+    onOpen: openEndGameModal,
   } = useModal();
 
   const onEndGame = useCallback(() => {
     stopTimer();
-    openEndGameModa();
-  }, [stopTimer, openEndGameModa]);
+    openEndGameModal();
+  }, [stopTimer, openEndGameModal]);
 
   return (
     <>
@@ -39,8 +39,8 @@ const Body: React.FC<BodyProps> = ({ grid }) => {
       />
       <EndGameModal
         isOpen={isEndGameModalOpen}
-        onClose={closeEndGameModa}
-        onOpen={openEndGameModa}
+        onClose={closeEndGameModal}
+        onOpen={openEndGameModal}
         time={time}
       />
 
