@@ -59,9 +59,8 @@ interface SudokuGridProps {
 }
 
 interface SudokuSubGridProps {
-  initialGrid: string;
+  initialSubGrid: string;
   subGrid: string;
-  index: number;
   selectedCell: { row: number; column: number };
   errorIndices: number[];
   inputMode: InputMode;
@@ -69,9 +68,9 @@ interface SudokuSubGridProps {
   setValue: (index: number, v: string | null) => void;
 }
 
-interface SudokuGridCellProps {
+export interface SudokuGridCellProps {
   value?: string;
-  setValue: (v: string | null) => void;
+  onUpdateNotes: () => void;
   isEditable: boolean;
   isSelected: boolean;
   isHighlighted: boolean;
@@ -154,6 +153,10 @@ const SudokuGrid: React.FC<SudokuGridProps> = ({
   setSelectedCellRow,
   updateGrid,
 }) => {
+  const initialSubGrids = useMemo(
+    () => calculateSubGrids(initialGrid),
+    [initialGrid]
+  );
   const subGrids = useMemo(() => calculateSubGrids(grid), [grid]);
 
   const onKeyDown = useCallback(
@@ -207,62 +210,75 @@ const SudokuGrid: React.FC<SudokuGridProps> = ({
 
   return (
     <div className="grid grid-rows-3 grid-cols-3 w-full xl:h-4/5 aspect-square gap-0.5 bg-black border-[5px] border-black">
-      {Array.from({ length: 9 }).map((_, subGridIndex) => (
-        // TODO what if subGrids is empty array or less than 9?
-        <SudokuSubGrid
-          initialGrid={initialGrid}
-          key={subGridIndex}
-          index={subGridIndex}
-          inputMode={inputMode}
-          subGrid={subGrids[subGridIndex]}
-          selectedCell={{ column: selectedCellColumn, row: selectedCellRow }}
-          errorIndices={extrapolateIndicesForSubGrid(
-            errorIndices,
-            subGridIndex
-          )}
-          setValue={(cellIndex, value) =>
-            updateGrid(calculateCellIndexInGrid(subGridIndex, cellIndex), value)
-          }
-          selectCell={(cellIndex) => {
-            const { row, column } = calculateCellCoordinatesInGrid(
-              subGridIndex,
-              cellIndex
-            );
-            setSelectedCellColumn(column);
-            setSelectedCellRow(row);
-          }}
-        />
-      ))}
+      {Array.from({ length: 9 }).map((_, subGridIndex) => {
+        const subGridColumn = subGridIndex % 3;
+        const subGridRow = Math.floor(subGridIndex / 3);
+
+        const selectedSubGridColumn =
+          Math.floor(selectedCellColumn / 3) - subGridColumn;
+        const relativeSelectedCellColumn =
+          selectedSubGridColumn * 3 + (selectedCellColumn % 3);
+
+        const selectedSubGridRow = Math.floor(selectedCellRow / 3) - subGridRow;
+        const relativeSelectedCellRow =
+          selectedSubGridRow * 3 + (selectedCellRow % 3);
+
+        return (
+          // TODO what if subGrids is empty array or less than 9?
+          <SudokuSubGrid
+            key={subGridIndex}
+            inputMode={inputMode}
+            subGrid={subGrids[subGridIndex]}
+            initialSubGrid={initialSubGrids[subGridIndex]}
+            selectedCell={{
+              column: relativeSelectedCellColumn,
+              row: relativeSelectedCellRow,
+            }}
+            errorIndices={extrapolateIndicesForSubGrid(
+              errorIndices,
+              subGridIndex
+            )}
+            setValue={(cellIndex, value) =>
+              updateGrid(
+                calculateCellIndexInGrid(subGridIndex, cellIndex),
+                value
+              )
+            }
+            selectCell={(cellIndex) => {
+              const { row, column } = calculateCellCoordinatesInGrid(
+                subGridIndex,
+                cellIndex
+              );
+              setSelectedCellColumn(column);
+              setSelectedCellRow(row);
+            }}
+          />
+        );
+      })}
     </div>
   );
 };
 
 const SudokuSubGrid: React.FC<SudokuSubGridProps> = ({
-  initialGrid,
+  initialSubGrid,
   subGrid,
-  index: subGridIndex,
   selectedCell,
   errorIndices,
   inputMode,
   setValue,
   selectCell,
 }) => {
-  const initialSubGrid = calculateSubGrids(initialGrid)[subGridIndex];
-
   return (
     <div className="grid grid-rows-3 grid-cols-3 gap-px bg-darkGray">
       {Array.from({ length: 9 }).map((_, index) => {
-        const subGridColumn = subGridIndex % 3;
-        const subGridRow = Math.floor(subGridIndex / 3);
-
-        const column = subGridColumn * 3 + (index % 3);
-        const row = subGridRow * 3 + Math.floor(index / 3);
+        const column = index % 3;
+        const row = Math.floor(index / 3);
 
         return (
           <SudokuGridCell
             key={index}
-            value={subGrid[index] === "." ? "" : subGrid[index]}
-            setValue={(value) => setValue(index, value)}
+            value={subGrid[index]}
+            onUpdateNotes={() => setValue(index, null)}
             selectCell={() => selectCell(index)}
             inputMode={inputMode}
             isError={errorIndices.includes(index)}
@@ -271,11 +287,12 @@ const SudokuSubGrid: React.FC<SudokuSubGridProps> = ({
               column === selectedCell.column && row === selectedCell.row
             }
             isHighlighted={
-              // TODO refactor
               selectedCell.row === row ||
               selectedCell.column === column ||
-              (subGridColumn === Math.floor(selectedCell.column / 3) &&
-                subGridRow === Math.floor(selectedCell.row / 3))
+              (selectedCell.column >= 0 &&
+                selectedCell.column < 3 &&
+                selectedCell.row >= 0 &&
+                selectedCell.row < 3)
             }
           />
         );
@@ -284,20 +301,25 @@ const SudokuSubGrid: React.FC<SudokuSubGridProps> = ({
   );
 };
 
-const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
+export const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
   value,
-  setValue,
   isEditable,
   isSelected,
   isHighlighted,
   isError,
   inputMode,
+  onUpdateNotes,
   selectCell,
 }) => {
   const [notes, setNotes] = useState<number[]>([]);
   const [showNotes, setShowNotes] = useState(false);
 
+  if (isHighlighted) {
+    // console.log("val", value);
+  }
+
   useEffect(() => {
+    // If there is a new input, hide the notes
     setShowNotes(!isValidSudokuInput(value));
   }, [value]);
 
@@ -322,10 +344,10 @@ const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
         });
 
         setShowNotes(true);
-        setValue(null);
+        onUpdateNotes();
       }
     },
-    [inputMode, isEditable, isSelected, setValue]
+    [inputMode, isEditable, isSelected, onUpdateNotes]
   );
 
   useEffect(() => {
@@ -366,6 +388,8 @@ const SudokuGridCell: React.FC<SudokuGridCellProps> = ({
             />
           ))}
         </div>
+      ) : value === "." ? (
+        ""
       ) : (
         value
       )}

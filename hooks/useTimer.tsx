@@ -1,5 +1,3 @@
-"use client";
-
 import { formatTime } from "@/utils/time";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 

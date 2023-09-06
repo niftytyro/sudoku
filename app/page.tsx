@@ -2,9 +2,15 @@ import Body from "@/components/Body";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 
-export default async function Home() {
+async function getPuzzle() {
   const supabase = createServerComponentClient({ cookies });
   const { data: puzzle } = await supabase.rpc("get_random_puzzle");
+
+  return puzzle;
+}
+
+export default async function Home() {
+  const puzzle = await getPuzzle();
 
   return (
     <>
