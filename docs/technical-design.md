@@ -2,6 +2,14 @@
 
 This app is built using Next.js, Tailwind CSS and Supabase.
 
+## The Problem & The Solution
+
+The problem statement is simple: Build an app that loads a random Sudoku puzzle and allows users to interact with the puzzle and once finished, verify the puzzle.
+
+Here's what the solution (or data flow) looks like:  
+The Next.js server uses the Supabase API to load a random puzzle from the database and then responds with the page containing the puzzle. The user then interacts with the puzzle on the client-side, where the logic for verification and real-time feedback exists.
+On every input, we verify the puzzle for errors, and chalk it out if there are any. Once the puzzle is finished, if there are no errors we display a congratulatory popup.
+
 ## HLD
 
 ### Setup
@@ -52,14 +60,6 @@ Other frameworks like MUI are more of component frameworks. They can be customiz
 
 Supabase is a great choice for backend. It supports PostgreSQL for the database which makes it easy to do complex things. Plus, it builds on top of PostgreSQL to provide a lot of handy functionality. Moreover, it is open source, which brings a lot of transparency and a very vibrant community support. Also, performance is a key selling point for Supabase.  
 It can also be used for other services like Storage and Authentication going forward.
-
-### The Problem & The Solution
-
-The problem statement is simple: Build an app that loads a random Sudoku puzzle and allows users to interact with the puzzle and once finished, verify the puzzle.
-
-Here's what the solution (or data flow) looks like:  
-The Next.js server uses the Supabase API to load a random puzzle from the database and then responds with the page containing the puzzle. The user then interacts with the puzzle on the client-side, where the logic for verification and real-time feedback exists.
-On every input, we verify the puzzle for errors, and chalk it out if there are any. Once the puzzle is finished, if there are no errors we display a congratulatory popup.
 
 ### Project Structure
 
